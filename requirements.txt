@@ -1,0 +1,5 @@
+google-genai
+python-dotenv
+edge-tts
+opencv-python
+requests
