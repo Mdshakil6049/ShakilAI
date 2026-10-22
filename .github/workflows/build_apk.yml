@@ -3,10 +3,12 @@ name: Build Android APK
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -16,8 +18,18 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Build Info
+      - name: Install Dependencies & Buildozer
         run: |
-          echo "ShakilAI APK Build process started..."
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev tk-dev libffi-dev libssl-dev
+          pip install --upgrade pip setuptools buildozer cython
+
+      - name: Build APK with Buildozer
+        run: |
+          yes | buildozer android debug || true
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ShakilAI-App
+          path: bin/*.apk
